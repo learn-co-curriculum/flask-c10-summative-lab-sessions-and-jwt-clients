@@ -21,7 +21,7 @@ You will not need to modify this frontend. However, your backend must implement 
 3. **Backend requirements**
    - Must use **Flask sessions** to store and manage authentication.
    - Expose routes that manage login, signup, logout, and session checking.
-   - Ensure `SESSION_COOKIE_SAMESITE` is set appropriately (e.g., `'Lax'`) if you're running the frontend and backend on different ports/domains.
+   - Should run on port 5555 to match proxy in package.json.
    - Return JSON responses for all routes.
 
 ---
