@@ -107,6 +107,7 @@ Users can only access and modify their own notes.
 ## Testing
 
 All endpoints were tested using curl with valid and invalid JWT tokens to verify authentication, authorization, and error handling.
-    
+
+Merged via GitHub Pull Request 
 
 
