@@ -3,22 +3,15 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../styles";
 
-function NavBar({ setUser }) {
-  function handleLogoutClick() {
-    localStorage.removeItem("token");
-    setUser(null);
-  }
-
+function NavBar({ user, onLogout }) {
   return (
     <Wrapper>
       <Logo>
         <Link to="/">My App</Link>
       </Logo>
       <Nav>
-        <Button>
-          Do Something
-        </Button>
-        <Button variant="outline" onClick={handleLogoutClick}>
+        <Button>Do Something</Button>
+        <Button variant="outline" onClick={onLogout}>
           Logout
         </Button>
       </Nav>

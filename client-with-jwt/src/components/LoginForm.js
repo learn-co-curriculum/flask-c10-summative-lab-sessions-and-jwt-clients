@@ -9,6 +9,7 @@ function LoginForm({ onLogin }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setErrors([]);
     setIsLoading(true);
     fetch("/login", {
       method: "POST",
@@ -19,9 +20,11 @@ function LoginForm({ onLogin }) {
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
-        r.json().then(({token, user}) => onLogin(token, user));
+        // Backend returns { access_token, user } -- destructure accordingly
+        r.json().then(({ access_token, user }) => onLogin(access_token, user));
       } else {
-        r.json().then((err) => setErrors(err.errors));
+        // Backend returns { error: "..." } as a string, not an array
+        r.json().then((data) => setErrors([data.error]));
       }
     });
   }

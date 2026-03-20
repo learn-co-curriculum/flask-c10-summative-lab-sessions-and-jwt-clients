@@ -3,25 +3,16 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Button } from "../styles";
 
-function NavBar({ user, setUser }) {
-  function handleLogoutClick() {
-    fetch("/logout", { method: "DELETE" }).then((r) => {
-      if (r.ok) {
-        setUser(null);
-      }
-    });
-  }
-
+function NavBar({ user, onLogout }) {
   return (
     <Wrapper>
       <Logo>
         <Link to="/">My App</Link>
       </Logo>
       <Nav>
-        <Button>
-          Do Something
-        </Button>
-        <Button variant="outline" onClick={handleLogoutClick}>
+        <Button>Do Something</Button>
+        {/* onLogout calls DELETE /logout on the server then clears user state */}
+        <Button variant="outline" onClick={onLogout}>
           Logout
         </Button>
       </Nav>

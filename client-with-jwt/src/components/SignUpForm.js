@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Button, Error, Input, FormField, Label, Textarea } from "../styles";
+import { Button, Error, Input, FormField, Label } from "../styles";
 
 function SignUpForm({ onLogin }) {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState([]);
@@ -10,24 +11,27 @@ function SignUpForm({ onLogin }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    // Client-side password confirmation check before hitting the server
+    if (password !== passwordConfirmation) {
+      setErrors(["Passwords do not match"]);
+      return;
+    }
     setErrors([]);
     setIsLoading(true);
-    fetch("/signup", {
+    fetch("/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        username,
-        password,
-        password_confirmation: passwordConfirmation
-      }),
+      body: JSON.stringify({ username, email, password }),
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
-        r.json().then(({token, user}) => onLogin(token, user));
+        // Backend returns { access_token, user } -- destructure accordingly
+        r.json().then(({ access_token, user }) => onLogin(access_token, user));
       } else {
-        r.json().then((err) => setErrors(err.errors));
+        // Backend returns { error: "..." } as a string, not an array
+        r.json().then((data) => setErrors([data.error]));
       }
     });
   }
@@ -45,23 +49,33 @@ function SignUpForm({ onLogin }) {
         />
       </FormField>
       <FormField>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          type="email"
+          id="email"
+          autoComplete="off"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </FormField>
+      <FormField>
         <Label htmlFor="password">Password</Label>
         <Input
           type="password"
           id="password"
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
         />
       </FormField>
       <FormField>
-        <Label htmlFor="password">Password Confirmation</Label>
+        <Label htmlFor="password_confirmation">Password Confirmation</Label>
         <Input
           type="password"
           id="password_confirmation"
+          autoComplete="new-password"
           value={passwordConfirmation}
           onChange={(e) => setPasswordConfirmation(e.target.value)}
-          autoComplete="current-password"
         />
       </FormField>
       <FormField>

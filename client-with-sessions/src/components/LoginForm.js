@@ -9,19 +9,24 @@ function LoginForm({ onLogin }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setErrors([]);
     setIsLoading(true);
     fetch("/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      // credentials: "include" sends the session cookie back with the response
+      credentials: "include",
       body: JSON.stringify({ username, password }),
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
+        // Session backend returns the user object directly (no token)
         r.json().then((user) => onLogin(user));
       } else {
-        r.json().then((err) => setErrors(err.errors));
+        // Backend returns { error: "..." } as a string, not an array
+        r.json().then((data) => setErrors([data.error]));
       }
     });
   }
