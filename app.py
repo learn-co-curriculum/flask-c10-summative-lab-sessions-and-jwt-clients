@@ -10,18 +10,14 @@ from resources.auth import SignupResource, LoginResource, MeResource
 from resources.notes import NotesResource, NoteResource
 
 def create_app():
-    """Create and configure the Flask app"""
-    # Create Flask app
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Initialize extensions
     db.init_app(app)
     Bcrypt(app)
     JWTManager(app)
     Migrate(app, db)
 
-    # Set up API routes
     api = Api(app)
     api.add_resource(SignupResource, '/signup')
     api.add_resource(LoginResource, '/login')
@@ -31,7 +27,6 @@ def create_app():
 
     @app.route('/')
     def home():
-        """Home route for the API"""
         return {"message": "Welcome to the Productivity App API. See README for endpoints."}, 200
 
     return app

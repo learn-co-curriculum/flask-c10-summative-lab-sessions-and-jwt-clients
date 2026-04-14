@@ -4,15 +4,12 @@ from flask_restful import Resource
 from models import Note, db
 
 class NotesResource(Resource):
-    """Handle notes list and creation"""
     @jwt_required()
     def get(self):
-        # TODO: maybe add more filters later
         user_id = get_jwt_identity()
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         notes = Note.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page)
-        # Format the response
         note_list = []
         for n in notes.items:
             note_list.append({"id": n.id, "title": n.title, "content": n.content})
@@ -29,7 +26,6 @@ class NotesResource(Resource):
         data = request.get_json()
         if not data or not data.get('title') or not data.get('content'):
             return {"error": "Title and content are required"}, 400
-        # Make sure title and content are strings
         title = str(data['title'])
         content = str(data['content'])
         note = Note(title=title, content=content, user_id=user_id)
@@ -38,7 +34,6 @@ class NotesResource(Resource):
         return {"id": note.id, "title": note.title, "content": note.content}, 201
 
 class NoteResource(Resource):
-    """Handle single note operations"""
     @jwt_required()
     def get(self, note_id):
         user_id = get_jwt_identity()
@@ -56,7 +51,6 @@ class NoteResource(Resource):
         data = request.get_json()
         if data is None:
             return {"error": "No data provided"}, 400
-        # Update only provided fields
         if 'title' in data:
             note.title = data['title']
         if 'content' in data:
