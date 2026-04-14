@@ -1,8 +1,8 @@
 from flask_restful import Resource
 from flask import request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_login import login_user, logout_user, login_required, current_user
 from models import User, db
-from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_bcrypt import check_password_hash
 
 class SignupResource(Resource):
     def post(self):
@@ -14,10 +14,11 @@ class SignupResource(Resource):
         if User.query.filter_by(username=username).first():
             return {"error": "Username already exists"}, 400
         user = User(username=username)
-        user._password_hash = generate_password_hash(password).decode('utf-8')
+        user.password_hash = password
         db.session.add(user)
         db.session.commit()
-        return {"message": "User created"}, 201
+        login_user(user)
+        return {"id": user.id, "username": user.username}, 201
 
 class LoginResource(Resource):
     def post(self):
@@ -27,14 +28,16 @@ class LoginResource(Resource):
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user._password_hash, password):
             return {"error": "Invalid credentials"}, 401
-        access_token = create_access_token(identity=user.id)
-        return {"access_token": access_token}, 200
+        login_user(user)
+        return {"id": user.id, "username": user.username}, 200
+
+class LogoutResource(Resource):
+    @login_required
+    def post(self):
+        logout_user()
+        return {"message": "Logged out"}, 200
 
 class MeResource(Resource):
-    @jwt_required()
+    @login_required
     def get(self):
-        user_id = get_jwt_identity()
-        user = User.query.get(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
-        return {"id": user.id, "username": user.username}, 200
+        return {"id": current_user.id, "username": current_user.username}, 200

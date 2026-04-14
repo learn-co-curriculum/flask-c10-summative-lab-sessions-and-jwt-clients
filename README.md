@@ -35,19 +35,22 @@ The app will be at http://localhost:5000.
 
 - **POST /signup**
   - Send: `{"username": "yourname", "password": "yourpass"}`
-  - Gets back: `{"message": "User created"}` or error
+  - Gets back: user info or error
 
 - **POST /login**
   - Send: `{"username": "yourname", "password": "yourpass"}`
-  - Gets back: `{"access_token": "tokenhere"}` or error
+  - Gets back: user info or error
+
+- **POST /logout**
+  - Logs out the current user
+  - Gets back: `{"message": "Logged out"}`
 
 - **GET /me**
-  - Need header: `Authorization: Bearer token`
-  - Gets back: user info or error
+  - Gets back: user info or error (requires login)
 
 ### For Notes
 
-All these need the token in header.
+All these require user to be logged in.
 
 - **GET /notes**
   - Can add ?page=1&per_page=10
