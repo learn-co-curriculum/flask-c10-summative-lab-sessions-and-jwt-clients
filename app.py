@@ -22,7 +22,6 @@ def create_app():
     api.add_resource(LogoutResource, '/logout')
     api.add_resource(MeResource, '/me')
     api.add_resource(NotesResource, '/notes')
-    api.add_resource(NoteResource, '/notes/<int:note_id>')
 
     @app.route('/')
     def home():

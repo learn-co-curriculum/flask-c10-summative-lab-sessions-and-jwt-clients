@@ -19,15 +19,6 @@ with app.app_context():
 
     db.session.commit()
 
-    for user in users:
-        for _ in range(3):
-            note = Note(
-                title=fake.sentence(),
-                content=fake.text(),
-                user_id=user.id
-            )
-            db.session.add(note)
-
-    db.session.commit()
+    print("Seeded database with users")
 
     print("Seeded database with users and notes")

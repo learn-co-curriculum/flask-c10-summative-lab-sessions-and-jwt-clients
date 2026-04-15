@@ -7,18 +7,11 @@ class NotesResource(Resource):
     @jwt_required
     def get(self):
         user_id = request.user.id
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
-        notes = Note.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page)
+        notes = Note.query.filter_by(user_id=user_id).all()
         note_list = []
-        for n in notes.items:
+        for n in notes:
             note_list.append({"id": n.id, "title": n.title, "content": n.content})
-        return {
-            "notes": note_list,
-            "total": notes.total,
-            "pages": notes.pages,
-            "page": page
-        }, 200
+        return note_list, 200
 
     @jwt_required
     def post(self):
@@ -58,12 +51,3 @@ class NoteResource(Resource):
         db.session.commit()
         return {"id": note.id, "title": note.title, "content": note.content}, 200
 
-    @jwt_required
-    def delete(self, note_id):
-        user_id = request.user.id
-        note = Note.query.filter_by(id=note_id, user_id=user_id).first()
-        if note is None:
-            return {"error": "Note not found"}, 404
-        db.session.delete(note)
-        db.session.commit()
-        return {"message": "Note deleted successfully"}, 200

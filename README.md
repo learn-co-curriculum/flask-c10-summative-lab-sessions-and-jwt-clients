@@ -2,25 +2,6 @@
 
 This is a Flask API for a productivity app. It has user login with JWT and lets users create, read, update, and delete their own notes.
 
-## How to Install
-
-1. Install the stuff needed:
-   ```
-   pipenv install
-   ```
-
-2. Set up the database:
-   ```
-   pipenv run flask db init
-   pipenv run flask db migrate -m "initial"
-   pipenv run flask db upgrade
-   ```
-
-3. Add some sample data:
-   ```
-   pipenv run python seed.py
-   ```
-
 ## How to Run
 
 ```
