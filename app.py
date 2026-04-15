@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_restful import Api
 
@@ -15,13 +14,7 @@ def create_app():
 
     db.init_app(app)
     Bcrypt(app)
-    login_manager = LoginManager(app)
     Migrate(app, db)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        from models import User
-        return User.query.get(int(user_id))
 
     api = Api(app)
     api.add_resource(SignupResource, '/signup')

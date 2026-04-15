@@ -1,12 +1,12 @@
 from flask import request
-from flask_login import login_required, current_user
 from flask_restful import Resource
 from models import Note, db
+from resources.auth import jwt_required
 
 class NotesResource(Resource):
-    @login_required
+    @jwt_required
     def get(self):
-        user_id = current_user.id
+        user_id = request.user.id
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         notes = Note.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page)
@@ -20,9 +20,9 @@ class NotesResource(Resource):
             "page": page
         }, 200
 
-    @login_required
+    @jwt_required
     def post(self):
-        user_id = current_user.id
+        user_id = request.user.id
         data = request.get_json()
         if not data or not data.get('title') or not data.get('content'):
             return {"error": "Title and content are required"}, 400
@@ -34,17 +34,17 @@ class NotesResource(Resource):
         return {"id": note.id, "title": note.title, "content": note.content}, 201
 
 class NoteResource(Resource):
-    @login_required
+    @jwt_required
     def get(self, note_id):
-        user_id = current_user.id
+        user_id = request.user.id
         note = Note.query.filter_by(id=note_id, user_id=user_id).first()
         if note is None:
             return {"error": "Note not found or not yours"}, 404
         return {"id": note.id, "title": note.title, "content": note.content}, 200
 
-    @login_required
+    @jwt_required
     def patch(self, note_id):
-        user_id = current_user.id
+        user_id = request.user.id
         note = Note.query.filter_by(id=note_id, user_id=user_id).first()
         if note is None:
             return {"error": "Note not found"}, 404
@@ -58,9 +58,9 @@ class NoteResource(Resource):
         db.session.commit()
         return {"id": note.id, "title": note.title, "content": note.content}, 200
 
-    @login_required
+    @jwt_required
     def delete(self, note_id):
-        user_id = current_user.id
+        user_id = request.user.id
         note = Note.query.filter_by(id=note_id, user_id=user_id).first()
         if note is None:
             return {"error": "Note not found"}, 404

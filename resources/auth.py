@@ -1,8 +1,30 @@
 from flask_restful import Resource
-from flask import request
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import request, jsonify
+import jwt
+from datetime import datetime, timedelta
 from models import User, db
 from flask_bcrypt import check_password_hash
+from resources.config import Config
+from functools import wraps
+
+def jwt_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return {"error": "Token missing"}, 401
+        try:
+            token = auth_header.split(" ")[1] if " " in auth_header else auth_header
+            payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+            request.user = User.query.get(payload['user_id'])
+            if not request.user:
+                return {"error": "User not found"}, 401
+        except jwt.ExpiredSignatureError:
+            return {"error": "Token expired"}, 401
+        except jwt.InvalidTokenError:
+            return {"error": "Invalid token"}, 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 class SignupResource(Resource):
     def post(self):
@@ -17,8 +39,11 @@ class SignupResource(Resource):
         user.password_hash = password
         db.session.add(user)
         db.session.commit()
-        login_user(user)
-        return {"id": user.id, "username": user.username}, 201
+        token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=24)
+        }, Config.SECRET_KEY, algorithm='HS256')
+        return {"token": token, "user": {"id": user.id, "username": user.username}}, 201
 
 class LoginResource(Resource):
     def post(self):
@@ -28,16 +53,29 @@ class LoginResource(Resource):
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user._password_hash, password):
             return {"error": "Invalid credentials"}, 401
-        login_user(user)
-        return {"id": user.id, "username": user.username}, 200
+        token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(hours=24)
+        }, Config.SECRET_KEY, algorithm='HS256')
+        return {"token": token, "user": {"id": user.id, "username": user.username}}, 200
 
 class LogoutResource(Resource):
-    @login_required
     def post(self):
-        logout_user()
         return {"message": "Logged out"}, 200
 
 class MeResource(Resource):
-    @login_required
     def get(self):
-        return {"id": current_user.id, "username": current_user.username}, 200
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return {"error": "Token missing"}, 401
+        try:
+            token = auth_header.split(" ")[1] if " " in auth_header else auth_header
+            payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+            user = User.query.get(payload['user_id'])
+            if not user:
+                return {"error": "User not found"}, 401
+            return {"id": user.id, "username": user.username}, 200
+        except jwt.ExpiredSignatureError:
+            return {"error": "Token expired"}, 401
+        except jwt.InvalidTokenError:
+            return {"error": "Invalid token"}, 401

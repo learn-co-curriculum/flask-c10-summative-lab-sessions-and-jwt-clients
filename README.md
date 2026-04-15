@@ -35,22 +35,23 @@ The app will be at http://localhost:5000.
 
 - **POST /signup**
   - Send: `{"username": "yourname", "password": "yourpass"}`
-  - Gets back: user info or error
+  - Gets back: `{"token": "jwt-token", "user": {...}}` or error
 
 - **POST /login**
   - Send: `{"username": "yourname", "password": "yourpass"}`
-  - Gets back: user info or error
+  - Gets back: `{"token": "jwt-token", "user": {...}}` or error
 
 - **POST /logout**
   - Logs out the current user
   - Gets back: `{"message": "Logged out"}`
 
 - **GET /me**
-  - Gets back: user info or error (requires login)
+  - Headers: `Authorization: Bearer <token>`
+  - Gets back: user info or error
 
 ### For Notes
 
-All these require user to be logged in.
+All these require JWT token in Authorization header: `Authorization: Bearer <token>`.
 
 - **GET /notes**
   - Can add ?page=1&per_page=10
