@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+instance/
+.venv/
+*.db
+*.sqlite3
+.DS_Store
+.pytest_cache/
+migrations/
+cookies.txt
