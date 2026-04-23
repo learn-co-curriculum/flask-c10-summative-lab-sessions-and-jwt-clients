@@ -5,8 +5,11 @@ import { Button } from "../styles";
 
 function NavBar({ setUser }) {
   function handleLogoutClick() {
-    localStorage.removeItem("token");
-    setUser(null);
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("token");
+      setUser(null);
+      alert("Logged out successfully!");
+    }
   }
 
   return (
@@ -15,9 +18,6 @@ function NavBar({ setUser }) {
         <Link to="/">My App</Link>
       </Logo>
       <Nav>
-        <Button>
-          Do Something
-        </Button>
         <Button variant="outline" onClick={handleLogoutClick}>
           Logout
         </Button>

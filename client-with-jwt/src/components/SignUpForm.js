@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Error, Input, FormField, Label, Textarea } from "../styles";
+import { Button, Error, Input, FormField, Label } from "../styles";
 
 function SignUpForm({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -25,7 +25,10 @@ function SignUpForm({ onLogin }) {
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
-        r.json().then(({token, user}) => onLogin(token, user));
+        r.json().then(({token, user}) => {
+          alert("Account created successfully!");
+          onLogin(token, user);
+        });
       } else {
         r.json().then((err) => setErrors(err.errors));
       }
@@ -39,7 +42,7 @@ function SignUpForm({ onLogin }) {
         <Input
           type="text"
           id="username"
-          autoComplete="off"
+          autoComplete="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />

@@ -19,7 +19,10 @@ function LoginForm({ onLogin }) {
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {
-        r.json().then(({token, user}) => onLogin(token, user));
+        r.json().then(({token, user}) => {
+          alert("Login successful!");
+          onLogin(token, user);
+        });
       } else {
         r.json().then((err) => setErrors(err.errors));
       }
@@ -33,7 +36,7 @@ function LoginForm({ onLogin }) {
         <Input
           type="text"
           id="username"
-          autoComplete="off"
+          autoComplete="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />

@@ -9,6 +9,10 @@ const COLORS = {
     "--main": "lavenderblush",
     "--accent": "indigo",
   },
+  danger: {
+    "--main": "#dc3545",
+    "--accent": "white",
+  },
 };
 
 function Button({ variant = "fill", color = "primary", ...props }) {
