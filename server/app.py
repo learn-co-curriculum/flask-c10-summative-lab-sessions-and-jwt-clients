@@ -1,5 +1,5 @@
 from flask import Flask
-
+from models import User
 from config import Config
 from extensions import bcrypt, db, migrate
 
