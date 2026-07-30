@@ -1,4 +1,6 @@
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
+
 from extensions import db, bcrypt
 
 
@@ -19,8 +21,24 @@ class User(db.Model):
 
     @password_hash.setter
     def password_hash(self, password):
-        password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
-        self._password_hash = password_hash
+        if not password or len(password) < 8:
+            raise ValueError("Password must be at least 8 characters long.")
+
+        self._password_hash = (
+            bcrypt.generate_password_hash(password).decode("utf-8")
+        )
+
+    @validates("username")
+    def validate_username(self, key, username):
+        if not username:
+            raise ValueError("Username is required.")
+
+        username = username.strip()
+
+        if len(username) < 3:
+            raise ValueError("Username must be at least 3 characters long.")
+
+        return username
 
     def authenticate(self, password):
         return bcrypt.check_password_hash(

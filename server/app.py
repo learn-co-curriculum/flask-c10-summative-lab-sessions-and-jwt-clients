@@ -1,7 +1,9 @@
 from flask import Flask
-from models import User
+
 from config import Config
 from extensions import bcrypt, db, migrate
+from models import User
+from routes import register_routes
 
 
 def create_app():
@@ -11,6 +13,8 @@ def create_app():
     db.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
+
+    register_routes(app)
 
     @app.get("/")
     def index():

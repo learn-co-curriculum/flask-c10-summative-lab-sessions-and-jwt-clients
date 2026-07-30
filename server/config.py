@@ -11,3 +11,4 @@ class Config:
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SESSION_COOKIE_HTTPONLY = True
