@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# SQLite database
+instance/
+*.db
+
+# Flask
+.flaskenv
+
+# Migrations cache
+migrations/__pycache__/
+
+# Pytest
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
