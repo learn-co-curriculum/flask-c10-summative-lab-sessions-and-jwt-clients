@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from models import db
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.config['JWT_SECRET_KEY'] = 'fake_secret_key'
 jwt = JWTManager(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
