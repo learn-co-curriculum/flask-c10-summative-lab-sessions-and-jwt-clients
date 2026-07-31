@@ -39,7 +39,7 @@ def register_routes(app):
             db.session.add(user)
             db.session.commit()
 
-            # Create session after successful signup
+            # Create session after signup is successful
             session["user_id"] = user.id
 
             return jsonify(user.to_dict()), 201
