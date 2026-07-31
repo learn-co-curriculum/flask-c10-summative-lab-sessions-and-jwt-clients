@@ -1,4 +1,9 @@
-from flask import request, jsonify, session
+from flask import request, jsonify
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity,
+)
 
 from extensions import db
 from models import User
@@ -39,14 +44,18 @@ def register_routes(app):
             db.session.add(user)
             db.session.commit()
 
-            # Create session after signup is successful
-            session["user_id"] = user.id
+            # Create JWT token
+            token = create_access_token(identity=user.id)
 
-            return jsonify(user.to_dict()), 201
+            return jsonify({
+                "token": token,
+                "user": user.to_dict()
+            }), 201
 
         except ValueError as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 400
+
 
     @app.post("/login")
     def login():
@@ -70,30 +79,33 @@ def register_routes(app):
                 "error": "Invalid username or password"
             }), 401
 
-        session["user_id"] = user.id
+        # Create JWT token
+        token = create_access_token(identity=str(user.id))
 
-        return jsonify(user.to_dict()), 200
+        return jsonify({
+            "token": token,
+            "user": user.to_dict()
+        }), 201
 
-    @app.get("/check_session")
-    def check_session():
-        user_id = session.get("user_id")
 
-        if user_id is None:
-            return jsonify({
-                "error": "Unauthorized"
-            }), 401
+        token = create_access_token(identity=str(user.id))
+
+        return jsonify({
+            "token": token,
+            "user": user.to_dict()
+        }), 200
+
+
+    @app.get("/me")
+    @jwt_required()
+    def me():
+
+        user_id = int(get_jwt_identity())
 
         user = db.session.get(User, user_id)
 
         if user is None:
-            session.clear()
-            return jsonify({
-                "error": "Unauthorized"
-            }), 401
+            return jsonify({"error": "User not found"}), 404
+
 
         return jsonify(user.to_dict()), 200
-
-    @app.delete("/logout")
-    def logout():
-        session.clear()
-        return "", 204
