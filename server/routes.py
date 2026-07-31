@@ -130,3 +130,26 @@ def register_routes(app):
         except ValueError as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 400
+
+    @app.get("/movies")
+    @jwt_required()
+    def get_movies():
+
+        user_id = int(get_jwt_identity())
+
+        page = request.args.get("page", default=1, type=int)
+        per_page = request.args.get("per_page", default=5, type=int)
+
+        pagination = (
+            Movie.query
+            .filter_by(user_id=user_id)
+            .paginate(page=page, per_page=per_page, error_out=False)
+        )
+
+        return jsonify({
+            "movies": [movie.to_dict() for movie in pagination.items],
+            "page": pagination.page,
+            "pages": pagination.pages,
+            "total": pagination.total,
+            "per_page": pagination.per_page
+        }), 200
