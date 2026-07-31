@@ -11,6 +11,7 @@ from models import User, Movie
 
 def register_routes(app):
 
+    # Sign up
     @app.post("/signup")
     def signup():
         data = request.get_json()
@@ -51,6 +52,7 @@ def register_routes(app):
             db.session.rollback()
             return jsonify({"error": str(e)}), 400
 
+    # Login
     @app.post("/login")
     def login():
         data = request.get_json()
@@ -69,7 +71,9 @@ def register_routes(app):
         user = User.query.filter_by(username=username).first()
 
         if user is None or not user.authenticate(password):
-            return jsonify({"error": "Invalid username or password"}), 401
+            return jsonify({
+                "error": "Invalid username or password"
+            }), 401
 
         token = create_access_token(identity=str(user.id))
 
@@ -78,9 +82,11 @@ def register_routes(app):
             "user": user.to_dict()
         }), 200
 
+    # Current user
     @app.get("/me")
     @jwt_required()
     def me():
+
         user_id = int(get_jwt_identity())
 
         user = db.session.get(User, user_id)
@@ -90,6 +96,7 @@ def register_routes(app):
 
         return jsonify(user.to_dict()), 200
 
+    # Create Movie
     @app.post("/movies")
     @jwt_required()
     def create_movie():
@@ -131,6 +138,8 @@ def register_routes(app):
             db.session.rollback()
             return jsonify({"error": str(e)}), 400
 
+
+    # Get all Movies
     @app.get("/movies")
     @jwt_required()
     def get_movies():
@@ -153,3 +162,84 @@ def register_routes(app):
             "total": pagination.total,
             "per_page": pagination.per_page
         }), 200
+
+    # Get a Movie
+    @app.get("/movies/<int:movie_id>")
+    @jwt_required()
+    def get_movie(movie_id):
+
+        user_id = int(get_jwt_identity())
+
+        movie = Movie.query.filter_by(
+            id=movie_id,
+            user_id=user_id
+        ).first()
+
+        if movie is None:
+            return jsonify({"error": "Movie not found"}), 404
+
+        return jsonify(movie.to_dict()), 200
+
+    # Update Movie
+    @app.patch("/movies/<int:movie_id>")
+    @jwt_required()
+    def update_movie(movie_id):
+
+        user_id = int(get_jwt_identity())
+
+        movie = Movie.query.filter_by(
+            id=movie_id,
+            user_id=user_id
+        ).first()
+
+        if movie is None:
+            return jsonify({"error": "Movie not found"}), 404
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "Request body must be JSON"}), 400
+
+        try:
+            if "title" in data:
+                movie.title = data["title"]
+
+            if "genre" in data:
+                movie.genre = data["genre"]
+
+            if "director" in data:
+                movie.director = data["director"]
+
+            if "release_year" in data:
+                movie.release_year = data["release_year"]
+
+            if "rating" in data:
+                movie.rating = data["rating"]
+
+            db.session.commit()
+
+            return jsonify(movie.to_dict()), 200
+
+        except ValueError as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 400
+
+    # Delete Movie
+    @app.delete("/movies/<int:movie_id>")
+    @jwt_required()
+    def delete_movie(movie_id):
+
+        user_id = int(get_jwt_identity())
+
+        movie = Movie.query.filter_by(
+            id=movie_id,
+            user_id=user_id
+        ).first()
+
+        if movie is None:
+            return jsonify({"error": "Movie not found"}), 404
+
+        db.session.delete(movie)
+        db.session.commit()
+
+        return "", 204
