@@ -2,13 +2,16 @@
 """
 seed.py
 -------
-Populates the database with sample data for development and manual testing.
+Populates the database with sample data for development and testing.
+
+Matches the User model which no longer has an email field, consistent
+with what the client-with-sessions frontend sends during signup.
 
 Seeded data:
-    - 3 User accounts (password: password123 for all)
+    - 3 User accounts  (password: password123)
     - 5 Notes per user (15 notes total)
 
-Safe to re-run — clears all existing data before seeding.
+Safe to re-run — clears all existing records before inserting new ones.
 """
 
 from faker import Faker
@@ -25,24 +28,21 @@ def clear_data():
     Note.query.delete()
     User.query.delete()
     db.session.commit()
-    print("  All records deleted.")
+    print("  Done.")
 
 
 def seed_users():
     """
-    Create 3 sample user accounts.
-    All accounts share the password 'password123' for easy testing.
+    Create 3 sample user accounts with hashed passwords.
+    All use the same password for easy manual testing.
     Returns the list of created User objects.
     """
     print("Seeding users...")
     users = []
 
     for _ in range(3):
-        user = User(
-            username=fake.unique.user_name(),
-            email=fake.unique.email(),
-        )
-        # password_hash setter automatically hashes this value with bcrypt
+        user = User(username=fake.unique.user_name())
+        # password_hash setter hashes this automatically via bcrypt
         user.password_hash = 'password123'
         db.session.add(user)
         users.append(user)
@@ -54,8 +54,8 @@ def seed_users():
 
 def seed_notes(users):
     """
-    Create 5 notes for each user.
-    Each note has a randomly generated title and content.
+    Create 5 notes for each user with randomly generated content.
+    Each note is linked to its owner via user_id.
     """
     print("Seeding notes...")
     total = 0
@@ -74,23 +74,22 @@ def seed_notes(users):
     print(f"  Created {total} notes.")
 
 
-def print_seed_summary(users):
-    """Print a summary of all seeded accounts to the terminal."""
-    print("\n" + "=" * 50)
+def print_summary(users):
+    """Print login credentials for all seeded accounts."""
+    print("\n" + "=" * 45)
     print("Seed complete. Test accounts (password: password123):")
-    print("=" * 50)
+    print("=" * 45)
     for user in users:
-        print(f"  id={user.id}  username={user.username}  email={user.email}")
-    print("=" * 50 + "\n")
+        print(f"  id={user.id}  username={user.username}")
+    print("=" * 45 + "\n")
 
 
 def seed():
-    """Run the full seed process inside the Flask app context."""
     with app.app_context():
         clear_data()
         users = seed_users()
         seed_notes(users)
-        print_seed_summary(users)
+        print_summary(users)
 
 
 if __name__ == '__main__':
