@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""
-seed.py
--------
-Populates the database with sample data for development and testing.
-
-Matches the User model which no longer has an email field, consistent
-with what the client-with-sessions frontend sends during signup.
-
-Seeded data:
-    - 3 User accounts  (password: password123)
-    - 5 Notes per user (15 notes total)
-
-Safe to re-run — clears all existing records before inserting new ones.
-"""
-
 from faker import Faker
 
 from config import app, db
@@ -32,11 +17,6 @@ def clear_data():
 
 
 def seed_users():
-    """
-    Create 3 sample user accounts with hashed passwords.
-    All use the same password for easy manual testing.
-    Returns the list of created User objects.
-    """
     print("Seeding users...")
     users = []
 
@@ -53,10 +33,6 @@ def seed_users():
 
 
 def seed_notes(users):
-    """
-    Create 5 notes for each user with randomly generated content.
-    Each note is linked to its owner via user_id.
-    """
     print("Seeding notes...")
     total = 0
 
