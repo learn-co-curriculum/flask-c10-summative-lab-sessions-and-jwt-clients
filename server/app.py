@@ -67,18 +67,6 @@ class Signup(Resource):
 
 
 class Login(Resource):
-    """
-    POST /login
-    -----------
-    Matches LoginForm.js which sends: { username, password }
-
-    - Looks up the user by username
-    - Verifies the password using bcrypt
-    - Sets session['user_id'] on success
-    - Returns { id, username } with 200 on success
-    - Returns { errors: [...] } with 401 on invalid credentials
-    """
-
     def post(self):
         data     = request.get_json()
         username = data.get('username', '').strip()
@@ -96,38 +84,12 @@ class Login(Resource):
 
 
 class Logout(Resource):
-    """
-    DELETE /logout
-    --------------
-    Matches NavBar.js which calls DELETE /logout and checks if (r.ok).
-
-    Clears the session user_id and returns 204 No Content.
-    204 is a 2xx status so r.ok will be true in the frontend.
-    """
-
     def delete(self):
         session['user_id'] = None
         return {}, 204
 
 
 class CheckSession(Resource):
-    """
-    GET /check_session
-    ------------------
-    Matches App.js which calls GET /check_session on mount:
-
-        fetch("/check_session").then((r) => {
-          if (r.ok) {
-            r.json().then((user) => setUser(user));
-          }
-        });
-
-    IMPORTANT: Must return a non-2xx status when not logged in.
-    Returning 204 (which is 2xx) would cause r.json() to run on an
-    empty body, throwing a parse error. Returning 401 correctly makes
-    r.ok false so the frontend keeps user as null and shows the login page.
-    """
-
     def get(self):
         user = get_current_user()
 
@@ -176,6 +138,8 @@ class NoteList(Resource):
         data    = request.get_json()
         title   = data.get('title', '').strip()
         content = data.get('content', '').strip()
+        category = data.get('category', 'General').strip()note = Note(title=title, content=content,
+            category=category, user_id=user.id)
 
         errors = []
         if not title:
@@ -235,6 +199,9 @@ class NoteDetail(Resource):
                 errors.append('Content cannot be empty.')
             else:
                 note.content = data['content'].strip()
+        
+        if 'category' in data:
+            note.category = data['category'].strip() or 'General'
 
         if errors:
             return {'errors': errors}, 422

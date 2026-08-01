@@ -38,26 +38,14 @@ class User(db.Model):
 
     @hybrid_property
     def password_hash(self):
-        """
-        Prevent the password hash from being read directly.
-        Raising here ensures the hash is never serialised or logged.
-        """
         raise Exception("Password hashes may not be viewed.")
 
     @password_hash.setter
     def password_hash(self, password):
-        """
-        Hash a plain-text password with bcrypt and store the result.
-        The original password is never persisted to the database.
-        """
         hashed = bcrypt.generate_password_hash(password.encode('utf-8'))
         self._password_hash = hashed.decode('utf-8')
 
     def authenticate(self, password):
-        """
-        Return True if the given plain-text password matches the stored hash.
-        Called during login to verify credentials.
-        """
         return bcrypt.check_password_hash(
             self._password_hash,
             password.encode('utf-8')
@@ -75,6 +63,10 @@ class Note(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
     title      = db.Column(db.String(200), nullable=False)
     content    = db.Column(db.Text, nullable=False)
+
+    # NEW — optional category field with a default value
+    category   = db.Column(db.String(50), nullable=False, default='General')
+
 
     # Automatically set on creation; updated on every change
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -124,6 +116,7 @@ class NoteSchema(Schema):
     id         = fields.Int(dump_only=True)
     title      = fields.Str()
     content    = fields.Str()
+    category   = fields.Str()
     user_id    = fields.Int(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
