@@ -116,9 +116,11 @@ class NoteList(Resource):
         paginated = (
             Note.query
             .filter_by(user_id=user.id)
-            .order_by(Note.created_at.desc())
+            .order_by(Note.is_pinned.desc(), Note.created_at.desc())
             .paginate(page=page, per_page=per_page, error_out=False)
         )
+
+        
 
         return {
             'notes'        : notes_schema.dump(paginated.items),
@@ -138,8 +140,8 @@ class NoteList(Resource):
         data    = request.get_json()
         title   = data.get('title', '').strip()
         content = data.get('content', '').strip()
-        category = data.get('category', 'General').strip()note = Note(title=title, content=content,
-            category=category, user_id=user.id)
+        category = data.get('category', 'General').strip() 
+        
 
         errors = []
         if not title:
@@ -149,11 +151,11 @@ class NoteList(Resource):
         if errors:
             return {'errors': errors}, 422
 
-        note = Note(title=title, content=content, user_id=user.id)
+        note = Note(title=title, content=content, category = category, user_id=user.id)
         db.session.add(note)
         db.session.commit()
 
-        return note_schema.dump(note), 201
+        return note_schema.dump(note), 201    
 
 
 class NoteDetail(Resource):
@@ -202,6 +204,10 @@ class NoteDetail(Resource):
         
         if 'category' in data:
             note.category = data['category'].strip() or 'General'
+        
+        # In NoteDetail.patch()
+        if 'is_pinned' in data:
+            note.is_pinned = bool(data['is_pinned'])
 
         if errors:
             return {'errors': errors}, 422

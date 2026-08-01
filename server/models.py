@@ -67,6 +67,9 @@ class Note(db.Model):
     # NEW — optional category field with a default value
     category   = db.Column(db.String(50), nullable=False, default='General')
 
+    # NEW — pinned notes sort to the top of the list
+    is_pinned  = db.Column(db.Boolean, nullable=False, default=False)
+
 
     # Automatically set on creation; updated on every change
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -117,6 +120,7 @@ class NoteSchema(Schema):
     title      = fields.Str()
     content    = fields.Str()
     category   = fields.Str()
+    is_pinned  = fields.Bool()
     user_id    = fields.Int(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
