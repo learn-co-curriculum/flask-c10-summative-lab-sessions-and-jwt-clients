@@ -20,11 +20,16 @@ import models
 
 # Import resources
 from resources.auth import Signup, Login, Me
+from resources.task import TaskList, TaskResource
 
 # Register routes
 api.add_resource(Signup, "/signup")
 api.add_resource(Login, "/login")
 api.add_resource(Me, "/me")
+
+api.add_resource(TaskList, "/tasks")
+api.add_resource(TaskResource, "/tasks/<int:id>")
+
 
 @app.route("/")
 def home():
