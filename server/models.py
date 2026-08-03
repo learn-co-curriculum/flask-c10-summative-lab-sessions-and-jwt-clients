@@ -6,19 +6,19 @@ from sqlalchemy.orm import validates
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(
         db.Integer,
         primary_key=True,
-        unique=True,
     )
 
     username = db.Column(
         db.String(50),
-        nullable=False,
         unique=True,
+        nullable=False,
     )
 
     _password_hash = db.Column(
@@ -34,49 +34,68 @@ class User(db.Model):
     )
 
     @property
-    def password_hash(self):    
-        raise AttributeError("Password hashes may not be viewed.")
+    def password(self):
+        raise AttributeError(
+            "Password cannot be viewed."
+        )
 
-    @password_hash.setter
-    def password_hash(self, password):
-        if not password:
-            raise ValueError("Password is required.")
+    @password.setter
+    def password(self, password):
+        if not isinstance(password, str):
+            raise ValueError(
+                "Password must be a string."
+            )
 
         if len(password) < 8:
-            raise ValueError("Password must be at least 8 characters long.")
+            raise ValueError(
+                "Password must contain at least 8 characters."
+            )
 
         self._password_hash = (
-            bcrypt.generate_password_hash(password)
-            .decode("utf-8")
+            bcrypt.generate_password_hash(
+                password
+            ).decode("utf-8")
         )
 
     def authenticate(self, password):
-        if not self._password_hash:
+        if not password:
             return False
-        
+
         return bcrypt.check_password_hash(
             self._password_hash,
             password,
         )
 
-
     @validates("username")
-    def validate_username(self, key, username):
-        if not username or not username.strip():
-            raise ValueError("Username is required.")
+    def validate_username(
+        self,
+        key,
+        username,
+    ):
+        if not isinstance(username, str):
+            raise ValueError(
+                "Username must be a string."
+            )
 
         username = username.strip()
 
         if len(username) < 3:
-            raise ValueError("Username must be at least 3 characters long.")
+            raise ValueError(
+                "Username must contain at least 3 characters."
+            )
 
         if len(username) > 50:
-            raise ValueError("Username must be at most 50 characters long.")
+            raise ValueError(
+                "Username cannot exceed 50 characters."
+            )
 
-        return username 
+        return username
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return (
+            f"<User {self.id}: "
+            f"{self.username}>"
+        )
 
 
 class Task(db.Model):
@@ -85,7 +104,6 @@ class Task(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True,
-        unique=True,
     )
 
     title = db.Column(
@@ -130,39 +148,61 @@ class Task(db.Model):
     )
 
     @validates("title")
-    def validate_title(self, key, title):
-        if not title or not title.strip():
-            raise ValueError("Title is required.")
+    def validate_title(
+        self,
+        key,
+        title,
+    ):
+        if not isinstance(title, str):
+            raise ValueError(
+                "Title must be a string."
+            )
 
         title = title.strip()
 
-        if len(title) < 3:
-            raise ValueError("Title must be at least 3 characters long.")
+        if not title:
+            raise ValueError(
+                "Title is required."
+            )
 
         if len(title) > 100:
-            raise ValueError("Title must be at most 100 characters long.")
+            raise ValueError(
+                "Title cannot exceed 100 characters."
+            )
 
         return title
 
     @validates("description")
-    def validate_description(self, key, description):
+    def validate_description(
+        self,
+        key,
+        description,
+    ):
         if description is None:
             return ""
 
         if not isinstance(description, str):
-            raise ValueError("Description must be a string.")
-
-        if len(description) > 1000:
-            raise ValueError("Description must be at most 1000 characters long.")
+            raise ValueError(
+                "Description must be a string."
+            )
 
         return description.strip()
 
     @validates("completed")
-    def validate_completed(self, key, completed):
+    def validate_completed(
+        self,
+        key,
+        completed,
+    ):
         if not isinstance(completed, bool):
-            raise ValueError("Completed must be a boolean value.")
+            raise ValueError(
+                "Completed must be true or false."
+            )
 
         return completed
 
     def __repr__(self):
-        return f"<Task{self.id} {self.title}>"
+        return (
+            f"<Task {self.id}: "
+            f"{self.title}>"
+        )
