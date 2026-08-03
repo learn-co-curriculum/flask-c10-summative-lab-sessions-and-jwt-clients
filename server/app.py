@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
 from config import Config
+from models import User, Task
 
 app = Flask(__name__)
 app.config.from_object(Config)
