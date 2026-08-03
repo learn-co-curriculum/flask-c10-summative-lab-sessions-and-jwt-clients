@@ -1,6 +1,6 @@
 
 from sqlalchemy.orm import validates
-from app import db, bcrypt
+from config import db, bcrypt
 
 class User(db.Model):
     __tablename__ = "users"

@@ -1,23 +1,22 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
 
-from config import Config
-from models import User, Task
+from config import Config, db, bcrypt, migrate, jwt
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
+db.init_app(app)
+bcrypt.init_app(app)
+migrate.init_app(app, db)
+jwt.init_app(app)
+
+from models import User, Task
+
 
 @app.route("/")
 def home():
     return {"message": "Productivity API is running!"}
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
