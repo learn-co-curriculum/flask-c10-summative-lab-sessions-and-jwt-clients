@@ -1,0 +1,5 @@
+This directory contains the database migration history for the Notes API.
+
+Apply the included initial schema with:
+
+    flask --app app db upgrade
