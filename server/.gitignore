@@ -1,0 +1,11 @@
+
+.venv/
+venv/
+
+instance/app.db
+
+__pycache__/
+*.py[cod]
+
+
+.env
