@@ -45,7 +45,7 @@ def login():
 @auth_bp.route("/logout", methods=["DELETE"])
 def logout():
     session.pop("user_id", None)
-    return {}, 204
+    return "", 204
 
 @auth_bp.route("/check_session", methods=["GET"])
 def check_session():
