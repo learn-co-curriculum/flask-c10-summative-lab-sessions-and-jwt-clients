@@ -1,10 +1,9 @@
 from flask import Flask
 from server.config import Config
 from server.models import db, bcrypt
+from flask_migrate import Migrate
 from server.routes.auth import auth_bp
 from server.routes.notes import notes_bp
-from flask_migrate import Migrate
-
 
 def create_app():
     app = Flask(__name__)
