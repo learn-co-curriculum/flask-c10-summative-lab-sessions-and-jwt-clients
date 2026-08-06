@@ -1,7 +1,7 @@
 from flask import Blueprint, request, session
-from models import db, Note
-from schemas import note_schema, notes_schema
-from decorators import login_required
+from server.models import db, Note
+from server.schemas import note_schema, notes_schema
+from server.decorators import login_required
 
 notes_bp = Blueprint("notes", __name__)
 
