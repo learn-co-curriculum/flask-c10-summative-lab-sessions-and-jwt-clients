@@ -16,7 +16,15 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #ff1aa9 0%, #bd3ae5 26%, #4c3ad4 56%, #0d3e8d 100%);
     font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: #4c1735;
+  }
+
+  #root {
+    min-height: 100vh;
   }
 `;
 
