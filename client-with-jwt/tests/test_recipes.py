@@ -12,7 +12,7 @@ def test_recipe_crud(client):
         "username": "chef_test",
         "password": "password123"
     })
-    
+
 # POST /recipes 
     create_res = client.post('/recipes', json={
         "title": "Pancakes",
@@ -25,3 +25,13 @@ def test_recipe_crud(client):
     recipe_data = create_res.get_json()
     recipe_id = recipe_data["id"]
     assert recipe_data["title"] == "Pancakes"
+
+    # GET /recipes 
+    get_all_res = client.get('/recipes')
+    assert get_all_res.status_code == 200
+    assert len(get_all_res.get_json()["recipes"]) == 1
+
+    # GET /recipes/<id> 
+    get_one_res = client.get(f'/recipes/{recipe_id}')
+    assert get_one_res.status_code == 200
+    assert get_one_res.get_json()["title"] == "Pancakes"
