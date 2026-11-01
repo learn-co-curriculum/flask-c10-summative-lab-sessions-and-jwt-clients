@@ -143,4 +143,5 @@ def handle_recipe_by_id(id):
         db.session.commit()
         return {}, 204
 
-    
+    if __name__ == '__main__':
+        app.run(port=5555, debug=True)
