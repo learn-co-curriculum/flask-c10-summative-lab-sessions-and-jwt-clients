@@ -70,3 +70,44 @@ def logout():
         session.pop('user_id', None)
         return {}, 204
     return jsonify({"error": "Unauthorized"}), 401
+
+
+# --- RECIPE CRUD & PAGINATION ---
+
+@app.route('/recipes', methods=['GET', 'POST'])
+def handle_recipes():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if request.method == 'GET':
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 5, type=int)
+
+        pagination = Recipe.query.filter_by(user_id=user_id).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+
+        return jsonify({
+            "recipes": [r.to_dict() for r in pagination.items],
+            "total": pagination.total,
+            "pages": pagination.pages,
+            "current_page": pagination.page
+        }), 200
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        try:
+            new_recipe = Recipe(
+                title=data.get('title'),
+                instructions=data.get('instructions'),
+                prep_time_minutes=data.get('prep_time_minutes', 15),
+                ingredients=data.get('ingredients', ''),
+                is_favorite=data.get('is_favorite', False),
+                user_id=user_id
+            )
+            db.session.add(new_recipe)
+            db.session.commit()
+            return jsonify(new_recipe.to_dict()), 201
+        except Exception as e:
+            return jsonify({"error": "Invalid recipe data"}), 400
