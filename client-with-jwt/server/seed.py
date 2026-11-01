@@ -15,3 +15,17 @@ with app.app_context():
     chef.password = "password123"
     db.session.add(chef)
     db.session.commit()
+
+    print("Seeding recipes...")
+    for _ in range(12):
+        recipe = Recipe(
+            title=fake.word().capitalize() + " Delight",
+            prep_time_minutes=fake.random_int(min=10, max=60),
+            ingredients=", ".join([fake.word() for _ in range(4)]),
+            is_favorite=fake.boolean(),
+            user_id=chef.id
+        )
+        db.session.add(recipe)
+
+    db.session.commit()
+    print("Database seeding completed!")
