@@ -111,3 +111,36 @@ def handle_recipes():
             return jsonify(new_recipe.to_dict()), 201
         except Exception as e:
             return jsonify({"error": "Invalid recipe data"}), 400
+
+
+@app.route('/recipes/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+def handle_recipe_by_id(id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    recipe = Recipe.query.get(id)
+    if not recipe:
+        return jsonify({"error": "Recipe not found"}), 404
+
+    # Authorization Check
+    if recipe.user_id != user_id:
+        return jsonify({"error": "Forbidden: You do not own this resource"}), 403
+
+    if request.method == 'GET':
+        return jsonify(recipe.to_dict()), 200
+
+    elif request.method == 'PATCH':
+        data = request.get_json()
+        for attr in data:
+            if hasattr(recipe, attr):
+                setattr(recipe, attr, data[attr])
+        db.session.commit()
+        return jsonify(recipe.to_dict()), 200
+
+    elif request.method == 'DELETE':
+        db.session.delete(recipe)
+        db.session.commit()
+        return {}, 204
+
+    
