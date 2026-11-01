@@ -35,3 +35,19 @@ def test_recipe_crud(client):
     get_one_res = client.get(f'/recipes/{recipe_id}')
     assert get_one_res.status_code == 200
     assert get_one_res.get_json()["title"] == "Pancakes"
+
+
+    # PATCH /recipes/<id>
+    patch_res = client.patch(f'/recipes/{recipe_id}', json={
+        "title": "Fluffy Pancakes"
+    })
+    assert patch_res.status_code == 200
+    assert patch_res.get_json()["title"] == "Fluffy Pancakes"
+
+    # DELETE /recipes/<id>
+    delete_res = client.delete(f'/recipes/{recipe_id}')
+    assert delete_res.status_code == 204
+
+    # Verify it's gone
+    verify_delete = client.get(f'/recipes/{recipe_id}')
+    assert verify_delete.status_code == 404
