@@ -4,7 +4,7 @@ def test_get_recipes_empty_list(auth_client):
     """Test fetching all recipes when the database is empty returns 200 OK and an empty list."""
     response = auth_client.get("/recipes")
     assert response.status_code == 200
-    assert response.get_json() == []
+    assert response.get_json()["recipes"] == []
 
 
 def test_get_recipes_populated(auth_client):
@@ -16,9 +16,9 @@ def test_get_recipes_populated(auth_client):
     response = auth_client.get("/recipes")
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 2
-    assert data[0]["title"] == "Pancakes"
-    assert data[1]["title"] == "Waffles"
+    assert len(data["recipes"]) == 2
+    assert data["recipes"][0]["title"] == "Pancakes"
+    assert data["recipes"][1]["title"] == "Waffles"
 
 
 def test_get_single_recipe_success(auth_client):
