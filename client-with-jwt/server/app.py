@@ -1,3 +1,4 @@
+
 from flask import Flask, request, session, jsonify
 from server.models import db, User, Recipe
 
@@ -8,14 +9,14 @@ app.secret_key = 'super_secret_key_change_me'
 
 db.init_app(app)
 
-# --- HOME ROUTE ---
+#  HOME ROUTE 
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Recipe Planner API!"})
 
 
-# --- AUTH ROUTES ---
+#  AUTH ROUTES 
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -99,7 +100,7 @@ def handle_recipes():
         try:
             new_recipe = Recipe(
                 title=data.get('title'),
-                instructions=data.get('instructions'),  # <-- Included correctly
+                instructions=data.get('instructions'),  
                 prep_time_minutes=data.get('prep_time_minutes', 15),
                 ingredients=data.get('ingredients', ''),
                 is_favorite=data.get('is_favorite', False),
@@ -145,3 +146,5 @@ def handle_recipe_by_id(id):
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+
