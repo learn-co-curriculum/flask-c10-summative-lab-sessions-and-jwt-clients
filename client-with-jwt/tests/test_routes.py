@@ -114,3 +114,24 @@ def test_update_recipe_invalid_data(client):
 
     response = client.patch(f"/recipes/{recipe_id}", json={"title": ""})
     assert response.status_code in [400, 422]
+
+
+# DELETE ROUTE TESTS
+
+def test_delete_recipe_success(client):
+    """Test deleting an existing recipe returns 200 OK or 204 No Content, and removes record."""
+    post_res = client.post("/recipes", json={"title": "Temp Recipe", "instructions": "Delete me."})
+    recipe_id = post_res.get_json()["id"]
+
+    # Delete the record
+    del_response = client.delete(f"/recipes/{recipe_id}")
+    assert del_response.status_code in [200, 204]
+
+    # Verify it can no longer be found
+    get_response = client.get(f"/recipes/{recipe_id}")
+    assert get_response.status_code == 404
+
+def test_delete_recipe_not_found(client):
+    """Test deleting a non-existent recipe ID returns 404 Not Found."""
+    response = client.delete("/recipes/9999")
+    assert response.status_code == 404
