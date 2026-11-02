@@ -104,7 +104,7 @@ def handle_recipes():
         try:
             new_recipe = Recipe(
                 title=data.get('title'),
-                instructions=data.get('instructions'),  # <-- Included correctly
+                instructions=data.get('instructions'),
                 prep_time_minutes=data.get('prep_time_minutes', 15),
                 ingredients=data.get('ingredients', ''),
                 is_favorite=data.get('is_favorite', False),
@@ -136,6 +136,11 @@ def handle_recipe_by_id(id):
 
     elif request.method == 'PATCH':
         data = request.get_json()
+        
+        # Validation check for empty title update
+        if "title" in data and not data["title"].strip():
+            return jsonify({"error": "Title cannot be empty"}), 400
+
         for attr in data:
             if hasattr(recipe, attr):
                 setattr(recipe, attr, data[attr])
