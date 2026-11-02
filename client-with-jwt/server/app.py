@@ -1,5 +1,6 @@
 from flask import Flask, request, session, jsonify
-from server.models import db, User, Recipe
+from server import db, bcrypt, migrate
+from server.models import User, Recipe
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recipe_planner.db'
@@ -7,15 +8,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'super_secret_key_change_me'
 
 db.init_app(app)
+bcrypt.init_app(app)
+migrate.init_app(app, db)
 
-# --- HOME ROUTE ---
+
+
+#  HOME ROUTE 
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Recipe Planner API!"})
 
 
-# --- AUTH ROUTES ---
+#  AUTH ROUTES 
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -71,7 +76,7 @@ def logout():
     return jsonify({"error": "Unauthorized"}), 401
 
 
-# --- RECIPE CRUD & PAGINATION ---
+#  RECIPE CRUD & PAGINATION 
 
 @app.route('/recipes', methods=['GET', 'POST'])
 def handle_recipes():
