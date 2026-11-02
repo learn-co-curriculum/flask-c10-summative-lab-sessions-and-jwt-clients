@@ -1,7 +1,5 @@
 from flask import Flask, request, session, jsonify
-from flask_bcrypt import Bcrypt
 from server.models import db, User, Recipe
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recipe_planner.db'
@@ -9,14 +7,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'super_secret_key_change_me'
 
 db.init_app(app)
-bcrypt = Bcrypt(app)
 
+# --- HOME ROUTE ---
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Recipe Planner API!"})
 
 
+# --- AUTH ROUTES ---
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -100,7 +99,7 @@ def handle_recipes():
         try:
             new_recipe = Recipe(
                 title=data.get('title'),
-                instructions=data.get('instructions'),
+                instructions=data.get('instructions'),  # <-- Included correctly
                 prep_time_minutes=data.get('prep_time_minutes', 15),
                 ingredients=data.get('ingredients', ''),
                 is_favorite=data.get('is_favorite', False),
@@ -143,5 +142,6 @@ def handle_recipe_by_id(id):
         db.session.commit()
         return {}, 204
 
-    if __name__ == '__main__':
-        app.run(port=5555, debug=True)
+
+if __name__ == '__main__':
+    app.run(port=5555, debug=True)
