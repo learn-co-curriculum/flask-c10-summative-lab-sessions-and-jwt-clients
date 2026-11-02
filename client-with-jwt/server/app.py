@@ -71,7 +71,7 @@ def logout():
     return jsonify({"error": "Unauthorized"}), 401
 
 
-# --- RECIPE CRUD & PAGINATION ---
+#  RECIPE CRUD & PAGINATION 
 
 @app.route('/recipes', methods=['GET', 'POST'])
 def handle_recipes():
