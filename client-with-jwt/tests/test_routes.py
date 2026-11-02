@@ -49,3 +49,68 @@ def test_get_single_recipe_success(client):
     data = response.get_json()
     assert data["id"] == recipe_id
     assert data["title"] == "Omelette"
+
+def test_get_single_recipe_not_found(client):
+    """Test fetching a non-existent recipe ID returns 404 Not Found."""
+    response = client.get("/recipes/9999")
+    assert response.status_code == 404
+    data = response.get_json()
+    assert "error" in data or "message" in data
+
+
+# CREATE ROUTE TESTS
+
+def test_create_recipe_success(client):
+    """Test creating a new valid recipe returns 201 Created with saved data."""
+    payload = {
+        "title": "Avocado Toast",
+        "instructions": "Toast bread, smash avocado on top."
+    }
+    response = client.post("/recipes", json=payload)
+    assert response.status_code == 201
+    data = response.get_json()
+    assert "id" in data
+    assert data["title"] == payload["title"]
+    assert data["instructions"] == payload["instructions"]
+
+def test_create_recipe_missing_required_fields(client):
+    """Test creating a recipe with missing required fields returns 400 Bad Request."""
+    payload = {"instructions": "Missing the title field"}
+    response = client.post("/recipes", json=payload)
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data or "message" in data
+
+def test_create_recipe_empty_payload(client):
+    """Test creating a recipe with an empty JSON object returns 400 Bad Request."""
+    response = client.post("/recipes", json={})
+    assert response.status_code == 400
+
+
+# UPDATE ROUTE TESTS
+
+
+def test_update_recipe_partial_success(client):
+    """Test updating specific fields of a recipe returns 200 OK."""
+    post_res = client.post("/recipes", json={"title": "Soup", "instructions": "Boil water."})
+    recipe_id = post_res.get_json()["id"]
+
+    patch_payload = {"title": "Vegetable Soup"}
+    response = client.patch(f"/recipes/{recipe_id}", json=patch_payload)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["title"] == "Vegetable Soup"
+    assert data["instructions"] == "Boil water."  # Unchanged field remains intact
+
+def test_update_recipe_not_found(client):
+    """Test updating a non-existent recipe ID returns 404 Not Found."""
+    response = client.patch("/recipes/9999", json={"title": "Ghost Recipe"})
+    assert response.status_code == 404
+
+def test_update_recipe_invalid_data(client):
+    """Test updating a recipe with invalid or empty data fields returns 400 Bad Request."""
+    post_res = client.post("/recipes", json={"title": "Salad", "instructions": "Chop veggies."})
+    recipe_id = post_res.get_json()["id"]
+
+    response = client.patch(f"/recipes/{recipe_id}", json={"title": ""})
+    assert response.status_code in [400, 422]
