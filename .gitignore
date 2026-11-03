@@ -1,0 +1,27 @@
+<<<<<<< HEAD
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Pytest cache
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local databases
+server/instance/*.db
+*.sqlite3
+=======
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+build/
+*.db
+instance/
+.env
+.DS_Store
+>>>>>>> origin/main
