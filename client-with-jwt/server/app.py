@@ -145,12 +145,18 @@ def handle_recipe_by_id(id):
 
     elif request.method == 'PATCH':
         data = request.get_json()
+        
+    # Validation check for empty title updates
+        if "title" in data and not data["title"].strip():
+            return jsonify({"error": "Title cannot be empty"}), 400
+
         for attr in data:
             if hasattr(recipe, attr):
                 setattr(recipe, attr, data[attr])
         db.session.commit()
         return jsonify(recipe.to_dict()), 200
 
+    
     elif request.method == 'DELETE':
         db.session.delete(recipe)
         db.session.commit()
