@@ -9,7 +9,7 @@ def test_password_is_hashed(app):
     with app.app_context():
         user = User(username="chef_model")
         user.password = "password123"
-        assert user.password_hash != "password123"
+        assert user._password_hash != "password123"
 
 
 def test_username_must_be_unique(app):
