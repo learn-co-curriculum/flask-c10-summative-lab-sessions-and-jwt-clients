@@ -1,3 +1,4 @@
+
 from flask import Flask, request, session, jsonify
 from server import db, bcrypt, migrate
 from server.models import User, Recipe
@@ -13,6 +14,7 @@ migrate.init_app(app, db)
 
 
 
+
 #  HOME ROUTE 
 
 @app.route('/')
@@ -24,6 +26,13 @@ def home():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+
+
+
+
+
+
+
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -104,7 +113,7 @@ def handle_recipes():
         try:
             new_recipe = Recipe(
                 title=data.get('title'),
-                instructions=data.get('instructions'),  # <-- Included correctly
+                instructions=data.get('instructions'),  
                 prep_time_minutes=data.get('prep_time_minutes', 15),
                 ingredients=data.get('ingredients', ''),
                 is_favorite=data.get('is_favorite', False),
@@ -150,3 +159,5 @@ def handle_recipe_by_id(id):
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
+
