@@ -1,111 +1,96 @@
 Recipe Planner API
 
-The Recipe Planner API is a robust RESTful backend application built as a collaborative group project by a team of five students for our software engineering curriculum. The platform enables users to manage recipes, categorize ingredients, structure meal plans, and track prep details efficiently through a clean set of JSON endpoints.
-
-Technical Overview & Architecture
-
-The application follows standard Model-View-Controller (MVC) principles for backend development. It uses Flask to handle HTTP routing, SQLAlchemy as the Object-Relational Mapper (ORM) for database interactions, and Alembic for managing database migrations.
-
-Core Features
-
-Complete Recipe Lifecycle (CRUD): Endpoints to create, fetch, modify, and delete recipes along with their ingredients and preparation steps.
-
-Relational Database Design: Structured relational models connecting recipes, ingredients, and categories using foreign key relationships and joint tables where appropriate.
-
-Database Migrations: Controlled database schema versioning using Flask-Migrate and Alembic.
-
-Automated Data Seeding: Built-in script (server/seed.py) to initialize the database with pre-populated dummy data for instant local testing.
-
-Test-Driven Reliability: Comprehensive test coverage written with pytest to validate application routes, status codes, and model validations.
-
-Tech Stack & Tooling
-
-Component
-
-Technology
+A RESTful backend service built with Flask and SQLAlchemy that allows users to manage recipes, ingredients, and instructions.
 
 Description
 
-Language
+This project was built to practice backend development, specifically setting up relational database models, writing REST API endpoints, handling data validation, and running migrations using Flask-Migrate.
 
-Python 3.12
+Core Features:
 
-Primary development language
+Recipe Management: Create, read, update, and delete recipe entries.
 
-Framework
+Relational Data: Models relationships between recipes and their corresponding ingredients.
 
-Flask
+Database Migrations: Configured using Alembic and Flask-Migrate for smooth database schema updates.
 
-Lightweight WSGI web application framework
+Automated Testing: Unit and route testing setup with pytest.
 
-ORM
+Seeding Script: Included pre-populated test data for quick development and verification.
 
-Flask-SQLAlchemy
+Tech Stack
 
-SQL toolkit and Object-Relational Mapper
+Language: Python 3.12+
 
-Database
+Framework: Flask
 
-SQLite
+ORM: Flask-SQLAlchemy
 
-Lightweight disk-based database engine
+Database: SQLite
 
-Migrations
+Migrations: Flask-Migrate / Alembic
 
-Flask-Migrate / Alembic
+Testing: Pytest
 
-Database schema migration tool
+Environment & Dependency Management: Pipenv
 
-Dependency Manager
+Installation Instructions
 
-Pipenv
+Follow these step-by-step instructions to get your development environment running locally.
 
-Deterministic package management via Pipfile
+1. Prerequisites
 
-Testing Framework
+Ensure you have Python 3 and Pipenv installed on your system.
 
-Pytest
+2. Clone the Repository
 
-Framework for unit and integration testing
-
-Repository Structure
-
-recipe-planner-api/
-├── instance/                 # Local SQLite database files
-│   └── recipe_planner.db
-├── migrations/               # Database migration versions managed by Alembic
-│   ├── versions/             # Individual migration script files
-│   ├── alembic.ini           # Configuration for Alembic runner
-│   └── env.py                # Environment setup for migration scripts
-├── server/                   # Main application package
-│   ├── tests/                # Automated API route and model tests
-│   │   └── test_routes.py    # Test cases for HTTP endpoints
-│   ├── __init__.py           # Package initialization
-│   ├── app.py                # Flask app instance and API route declarations
-│   ├── models.py             # SQLAlchemy database models and schema definitions
-│   └── seed.py               # Script for populating test data into the database
-├── .gitignore                # Git exclusion rules
-├── conftest.py               # Pytest configurations and fixtures
-├── Pipfile                   # Project dependencies and environment metadata
-└── Pipfile.lock              # Explicit lockfile for dependency resolution
+git clone <your-repository-url>
+cd recipe-planner-api
 
 
+3. Install Dependencies
 
-Database Schema & Models
+Set up the virtual environment and install required packages using Pipenv:
 
-The project uses SQLAlchemy to define the core data models (server/models.py):
+pipenv install
 
-Recipe: Stores core recipe metadata including title, description, prep time, cook time, and instructions.
 
-Ingredient: Represents individual food items or components used across multiple recipes.
+4. Activate the Virtual Environment
 
-RecipeIngredient (Association Model): Connects recipes to ingredients with additional quantity and unit attributes (e.g., "2 cups").
+pipenv shell
 
-API Endpoint Reference
 
-All requests and responses use standard JSON formatting (Content-Type: application/json).
+Run Instructions
 
-Recipes
+Follow these steps to initialize the database and run the server.
+
+1. Set Up the Database
+
+Run database migrations to generate the SQLite database schema:
+
+flask db upgrade
+
+
+2. Seed the Database (Optional)
+
+To populate your database with sample recipes and ingredients:
+
+python server/seed.py
+
+
+3. Start the Flask Server
+
+Launch the development server:
+
+python server/app.py
+
+
+The server will start running locally at:
+http://127.0.0.1:5000/
+
+API Reference
+
+Endpoints Overview
 
 Method
 
@@ -113,23 +98,17 @@ Endpoint
 
 Description
 
-Status Codes
-
 GET
 
 /recipes
 
-Retrieve a list of all stored recipes
-
-200 OK
+Retrieve a list of all recipes
 
 GET
 
-/recipes/<int:id>
+/recipes/<id>
 
-Retrieve full details for a single recipe by ID
-
-200 OK, 404 Not Found
+Retrieve detailed information for a specific recipe
 
 POST
 
@@ -137,100 +116,37 @@ POST
 
 Create a new recipe entry
 
-201 Created, 400 Bad Request
-
 PATCH
 
-/recipes/<int:id>
+/recipes/<id>
 
-Update fields on an existing recipe
-
-200 OK, 400 Bad Request, 404 Not Found
+Update fields of an existing recipe
 
 DELETE
 
-/recipes/<int:id>
+/recipes/<id>
 
-Remove a recipe entry from the database
+Remove a recipe from the database
 
-204 No Content, 404 Not Found
+Running Automated Tests
 
-Getting Started
-
-Prerequisites
-
-Python: Version 3.12 or higher
-
-Pipenv: Installed globally via pip install pipenv
-
-Installation & Local Setup
-
-Clone the repository:
-
-git clone <repository-url>
-cd recipe-planner-api
-
-
-
-Install project dependencies:
-
-pipenv install
-
-
-
-Activate the virtual environment:
-
-pipenv shell
-
-
-
-Initialize and seed the database:
-Execute the seed script to create all necessary database tables and populate sample data:
-
-python server/seed.py
-
-
-
-Run database migrations (Optional / Development):
-If you modify models in server/models.py, run:
-
-flask db migrate -m "Describe migration"
-flask db upgrade
-
-
-
-Start the local server:
-
-python server/app.py
-
-
-
-The API will be available at http://127.0.0.1:5000/.
-
-Testing
-
-The project includes an automated test suite located in server/tests/. To execute all tests:
+To run the test suite and verify that all endpoints function correctly:
 
 pytest
 
 
+Project Directory Overview
 
-To view verbose test output:
-
-pytest -v
-
-
-
-Authors & Team
-
-Developed collaboratively by a group of five students:
-
-Joseph
-
-Douglas
-
-Erick
-
-torshow
-
-Alex
+recipe-planner-api/
+│
+├── instance/               # SQLite database storage
+├── migrations/             # Alembic migration scripts
+├── server/
+│   ├── app.py              # Application entry point & route definitions
+│   ├── models.py           # SQLAlchemy data models
+│   ├── seed.py             # Database seed data script
+│   └── tests/              # Test suite
+│       └── test_routes.py  
+├── conftest.py             # Pytest fixtures and setup
+├── Pipfile                 # Dependency tracking
+└── Pipfile.lock            # Locked dependencies
