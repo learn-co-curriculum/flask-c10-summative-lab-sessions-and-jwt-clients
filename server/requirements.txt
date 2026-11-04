@@ -1,0 +1,9 @@
+Flask==2.2.2
+Flask-SQLAlchemy==3.0.3
+Flask-Migrate==3.1.0
+Flask-Bcrypt==1.0.1
+Flask-RESTful==0.3.10
+Flask-Cors==4.0.0
+Werkzeug==2.2.2
+marshmallow==3.20.1
+ipdb==0.13.9
