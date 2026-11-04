@@ -1,4 +1,3 @@
-
 from flask import Flask, request, session, jsonify
 from server import db, bcrypt, migrate
 from server.models import User, Recipe
@@ -14,7 +13,6 @@ migrate.init_app(app, db)
 
 
 
-
 #  HOME ROUTE 
 
 @app.route('/')
@@ -26,13 +24,6 @@ def home():
 
 @app.route('/signup', methods=['POST'])
 def signup():
-
-
-
-
-
-
-
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -113,7 +104,7 @@ def handle_recipes():
         try:
             new_recipe = Recipe(
                 title=data.get('title'),
-                instructions=data.get('instructions'),  
+                instructions=data.get('instructions'),
                 prep_time_minutes=data.get('prep_time_minutes', 15),
                 ingredients=data.get('ingredients', ''),
                 is_favorite=data.get('is_favorite', False),
@@ -146,7 +137,7 @@ def handle_recipe_by_id(id):
     elif request.method == 'PATCH':
         data = request.get_json()
         
-    # Validation check for empty title updates
+        # Validation check for empty title update
         if "title" in data and not data["title"].strip():
             return jsonify({"error": "Title cannot be empty"}), 400
 
@@ -156,7 +147,6 @@ def handle_recipe_by_id(id):
         db.session.commit()
         return jsonify(recipe.to_dict()), 200
 
-    
     elif request.method == 'DELETE':
         db.session.delete(recipe)
         db.session.commit()
@@ -165,5 +155,3 @@ def handle_recipe_by_id(id):
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
-
-
